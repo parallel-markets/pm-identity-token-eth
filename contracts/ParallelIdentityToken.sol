@@ -92,4 +92,12 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         super._burn(tokenId);
         delete _expirations[tokenId];        
     }
+
+    function burn(uint256 tokenId) public virtual {
+        require(_exists(tokenId), "ERC721: operator query for nonexistent token");
+        address tokenOwner = ERC721.ownerOf(tokenId);
+        // if the message sender is the token owner or the contract owner, allow burning
+        require(_msgSender() == tokenOwner || _msgSender() == owner(), "ERC721Burnable: caller is not owner nor approved");
+        _burn(tokenId);
+    }
 }
