@@ -38,7 +38,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         revert("Identity tokens cannot be transferred.");
     }
     
-    function mintIdentity(address recipient, string memory tokenDataURI, uint expiration, string[] memory traits) public onlyOwner returns (uint256) {
+    function mintIdentity(address recipient, string memory tokenDataURI, uint expiration, string[] memory traits) public virtual onlyOwner returns (uint256) {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
@@ -47,7 +47,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         _expirations[newItemId] = expiration;
 
         for (uint i = 0; i < traits.length; i++) {
-            setTrait(newItemId, traits[i]);
+            setTrait(newItemId, traits[i], true);
         }
 
         return newItemId;
@@ -57,17 +57,18 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         return _exists(tokenId) && _expirations[tokenId] > block.timestamp;
     }
 
-    function setTrait(uint256 tokenId, string memory trait) public onlyOwner {
-        setTrait(tokenId, trait, true);
+    function expires(uint256 tokenId) public view virtual returns (uint) {
+        require(_exists(tokenId), "Token does not exist");
+        return _expirations[tokenId];
     }
     
-    function setTrait(uint256 tokenId, string memory trait, bool value) public onlyOwner {
+    function setTrait(uint256 tokenId, string memory trait, bool value) public virtual onlyOwner {
         require(_unexpired(tokenId), "Trait request for expired token");
 
         bytes32 traitHash = keccak256(abi.encode(trait));
         _traits[tokenId][traitHash] = value;
     }
-
+    
     function getTrait(uint256 tokenId, string memory trait) public view virtual returns (bool) {
         require(_unexpired(tokenId), "Trait request for expired token");
 
