@@ -14,7 +14,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     Counters.Counter private _tokenIds;
     
     mapping(uint256 => mapping(bytes32 => bool)) private _traits;
-    mapping(uint256 => uint) private _expirations;
+    mapping(uint256 => uint) private _mintedAts;
     
     constructor() ERC721("ParallelMarketsID", "PMID") {}
 
@@ -38,13 +38,13 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         revert("Identity tokens cannot be transferred.");
     }
     
-    function mintIdentity(address recipient, string memory tokenDataURI, uint expiration, string[] memory traits) public virtual onlyOwner returns (uint256) {
+    function mintIdentity(address recipient, string memory tokenDataURI, string[] memory traits) public virtual onlyOwner returns (uint256) {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
         _safeMint(recipient, newItemId);
         _setTokenURI(newItemId, tokenDataURI);        
-        _expirations[newItemId] = expiration;
+        _mintedAts[newItemId] = block.timestamp;
 
         for (uint i = 0; i < traits.length; i++) {
             setTrait(newItemId, traits[i], true);
@@ -53,24 +53,24 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         return newItemId;
     }
 
-    function _unexpired(uint256 tokenId) internal view virtual returns (bool) {
-        return _exists(tokenId) && _expirations[tokenId] > block.timestamp;
+    function unexpired(uint256 tokenId) public view virtual returns (bool) {
+        return mintedAt(tokenId) >= block.timestamp - 90 days;
     }
 
-    function expires(uint256 tokenId) public view virtual returns (uint) {
-        require(_exists(tokenId), "Token does not exist");
-        return _expirations[tokenId];
+    function mintedAt(uint256 tokenId) public view virtual returns (uint) {
+        require(_exists(tokenId), "Minted at request for nonexistent token");
+        return _mintedAts[tokenId];
     }
     
     function setTrait(uint256 tokenId, string memory trait, bool value) public virtual onlyOwner {
-        require(_unexpired(tokenId), "Trait request for expired token");
+        require(_exists(tokenId), "Trait request for nonexistent token");
 
         bytes32 traitHash = keccak256(abi.encode(trait));
         _traits[tokenId][traitHash] = value;
     }
     
     function getTrait(uint256 tokenId, string memory trait) public view virtual returns (bool) {
-        require(_unexpired(tokenId), "Trait request for expired token");
+        require(_exists(tokenId), "Trait request for nonexistent token");
 
         bytes32 traitHash = keccak256(abi.encode(trait));
         return _traits[tokenId][traitHash];
@@ -90,14 +90,16 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
 
     function _burn(uint256 tokenId) internal virtual override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
-        delete _expirations[tokenId];        
+        delete _mintedAts[tokenId];        
     }
 
     function burn(uint256 tokenId) public virtual {
         require(_exists(tokenId), "ERC721: operator query for nonexistent token");
-        address tokenOwner = ERC721.ownerOf(tokenId);
-        // if the message sender is the token owner or the contract owner, allow burning
+        
+        // if the message sender is the token owner or the contract owner, allow burning        
+        address tokenOwner = ERC721.ownerOf(tokenId);        
         require(_msgSender() == tokenOwner || _msgSender() == owner(), "ERC721Burnable: caller is not owner nor approved");
+        
         _burn(tokenId);
     }
 }

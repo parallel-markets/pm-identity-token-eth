@@ -14,9 +14,8 @@ describe("ParallelMarketsID traits", function () {
     
     // mint a token
     const [owner, rando] = await ethers.getSigners();
-    const exp = Math.round((new Date()).getTime() / 1000) + 10
     const uri = "https://google.com"
-    const mintTx = await pmid.mintIdentity(rando.address, uri, exp, ["kyc_clear"])
+    const mintTx = await pmid.mintIdentity(rando.address, uri, ["kyc_clear"])
     await mintTx.wait()
 
     // the owner should have nothing
@@ -26,17 +25,18 @@ describe("ParallelMarketsID traits", function () {
     expect(await pmid.balanceOf(rando.address)).to.equal(1)
     expect(await pmid.getTrait(tokenId, "kyc_clear")).to.be.true
     expect(await pmid.getTrait(tokenId, "blurp")).to.be.false
+    const now = Math.round((new Date()).getTime() / 1000)
+    expect(await pmid.mintedAt(tokenId)).to.be.within(now - 1, now + 1)
     expect(await pmid.tokenURI(tokenId)).to.equal(uri)
-    expect(await pmid.expires(tokenId)).to.equal(exp)
+    expect(await pmid.unexpired(tokenId)).to.be.true
   })
 
   it("should be settable", async function () {
     const pmid = await deploy()    
 
     const [owner, rando] = await ethers.getSigners();
-    const exp = Math.round((new Date()).getTime() / 1000) + 10
     const uri = "https://google.com"
-    const mintTx = await pmid.mintIdentity(rando.address, uri, exp, ["kyc_clear"])
+    const mintTx = await pmid.mintIdentity(rando.address, uri, ["kyc_clear"])
     await mintTx.wait()
 
     const tokenId = await pmid.tokenOfOwnerByIndex(rando.address, 0)    
