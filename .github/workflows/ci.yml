@@ -1,0 +1,33 @@
+name: ci
+on: push
+
+env:
+  NODE_VERSION: 14.17.1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - uses: actions/cache@v1
+        id: node_modules-cache # id to use in retrieve action
+        with:
+          path: node_modules
+          key: test-node-modules-cache-v0-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - uses: actions/cache@v1
+        id: pnpm-store-cache # id to use in retrieve action
+        with:
+          path: ~/.pnpm-store
+          key: test-pnpm-store-cache-v0-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --no-optional
+        if: steps.node_modules-cache.outputs.cache-hit != 'true' || steps.pnpm-store-cache.outputs.cache-hit != 'true'
+
+      - run: pnpm test
