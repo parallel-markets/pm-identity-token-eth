@@ -3,7 +3,7 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-const hre = require("hardhat");
+const hre = require('hardhat')
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -14,18 +14,18 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const ParallelMarketsID = await hre.ethers.getContractFactory("ParallelMarketsID")
-  const pmid = await ParallelMarketsID.attach("0xb31317ad3BD8e188D3848713b88ddC76C977e4C6")
+  const ParallelMarketsID = await hre.ethers.getContractFactory('ParallelMarketsID')
+  const pmid = await ParallelMarketsID.attach('0xb31317ad3BD8e188D3848713b88ddC76C977e4C6')
+  // const pmid = await ParallelMarketsID.attach("0xb31317ad3BD8e188D3848713b88ddC76C977e4C6")
 
-  const addy = "0xf0495779260E786409c2ee6B85cE6Ef7B07377F8"
-  const uri = "https://parallelmarkets.com/token.json"
-  const exp = Math.round((new Date()).getTime() / 1000) + (86400 * 365)
-  await pmid.mintIdentity(addy, uri, exp, ["kyc_clear", "accredited"])
+  const addy = '0xf0495779260E786409c2ee6B85cE6Ef7B07377F8'
+  const uri = 'https://parallelmarkets.com/token.json'
+  await pmid.mintIdentity(addy, uri, ['kyc_clear', 'accredited'])
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})

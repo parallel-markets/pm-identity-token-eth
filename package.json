@@ -1,12 +1,13 @@
 {
-  "name": "pm-identity-token",
+  "name": "pm-identity-token-eth",
   "version": "0.0.1",
-  "description": "The Parallel Markets Identity Token (IDT)",
+  "description": "The Parallel Markets Identity Token (IDT) on Ethereum",
   "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "hardhat test"
+    "test": "pnpm lint && pnpm solhint 'contracts/**/*.sol' && hardhat test",
+    "lint": "eslint ./test hardhat.config.js ./scripts && prettier -l ./test hardhat.config.js ./scripts"
   },
-  "author": "",
   "license": "MIT",
   "devDependencies": {    
     "@nomiclabs/hardhat-ethers": "^2.0.3",
