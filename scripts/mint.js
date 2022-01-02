@@ -16,11 +16,10 @@ async function main() {
   // We get the contract to deploy
   const ParallelMarketsID = await hre.ethers.getContractFactory('ParallelMarketsID')
   const pmid = await ParallelMarketsID.attach('0xb31317ad3BD8e188D3848713b88ddC76C977e4C6')
-  // const pmid = await ParallelMarketsID.attach("0xb31317ad3BD8e188D3848713b88ddC76C977e4C6")
 
   const addy = '0xf0495779260E786409c2ee6B85cE6Ef7B07377F8'
   const uri = 'https://parallelmarkets.com/token.json'
-  await pmid.mintIdentity(addy, uri, ['kyc_clear', 'accredited'])
+  await pmid.mintIdentityToken(addy, uri, ['kyc_clear', 'accredited'])
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -14,6 +14,12 @@ const getTestAccount = async function () {
   return signers[1]
 }
 
+const fastForward = async function (seconds) {
+  const now = Math.round(new Date().getTime() / 1000)
+  await ethers.provider.send('evm_setNextBlockTimestamp', [now + seconds])
+  await ethers.provider.send('evm_mine')
+}
+
 describe('ParallelMarketsID traits', function () {
   it('should be initialized correctly', async function () {
     const pmid = await deploy()
@@ -21,7 +27,7 @@ describe('ParallelMarketsID traits', function () {
     // mint a token
     const [owner, rando] = await ethers.getSigners()
     const uri = 'https://google.com'
-    const mintTx = await pmid.mintIdentity(rando.address, uri, ['kyc_clear'])
+    const mintTx = await pmid.mintIdentityToken(rando.address, uri, ['kyc_clear'])
     await mintTx.wait()
 
     // the owner should have nothing
@@ -29,8 +35,9 @@ describe('ParallelMarketsID traits', function () {
 
     const tokenId = await pmid.tokenOfOwnerByIndex(rando.address, 0)
     expect(await pmid.balanceOf(rando.address)).to.equal(1)
-    expect(await pmid.getTrait(tokenId, 'kyc_clear')).to.be.true
-    expect(await pmid.getTrait(tokenId, 'blurp')).to.be.false
+    expect(await pmid.trait(tokenId, 'kyc_clear')).to.be.true
+    expect(await pmid.trait(tokenId, 'blurp')).to.be.false
+
     const now = Math.round(new Date().getTime() / 1000)
     expect(await pmid.mintedAt(tokenId)).to.be.within(now - 10, now + 10)
     expect(await pmid.tokenURI(tokenId)).to.equal(uri)
@@ -42,17 +49,17 @@ describe('ParallelMarketsID traits', function () {
 
     const rando = await getTestAccount()
     const uri = 'https://google.com'
-    const mintTx = await pmid.mintIdentity(rando.address, uri, ['kyc_clear'])
+    const mintTx = await pmid.mintIdentityToken(rando.address, uri, ['kyc_clear'])
     await mintTx.wait()
 
     const tokenId = await pmid.tokenOfOwnerByIndex(rando.address, 0)
     const updateTx = await pmid.setTrait(tokenId, 'accreditation', true)
     await updateTx.wait()
-    expect(await pmid.getTrait(tokenId, 'accreditation')).to.be.true
+    expect(await pmid.trait(tokenId, 'accreditation')).to.be.true
 
     const updateTwoTx = await pmid.setTrait(tokenId, 'accreditation', false)
     await updateTwoTx.wait()
-    expect(await pmid.getTrait(tokenId, 'accreditation')).to.be.false
+    expect(await pmid.trait(tokenId, 'accreditation')).to.be.false
   })
 
   it('should emit event when set', async function () {
@@ -60,10 +67,37 @@ describe('ParallelMarketsID traits', function () {
 
     const rando = await getTestAccount()
     const uri = 'https://google.com'
-    const mintTx = await pmid.mintIdentity(rando.address, uri, ['kyc_clear'])
+    const mintTx = await pmid.mintIdentityToken(rando.address, uri, ['kyc_clear'])
     await mintTx.wait()
 
     const tokenId = await pmid.tokenOfOwnerByIndex(rando.address, 0)
     await expect(pmid.setTrait(tokenId, 'accreditation', true)).to.emit(pmid, 'TraitUpdated').withArgs(tokenId, 'accreditation', true)
+  })
+
+  it('should know when an address has an unexpired trait', async function () {
+    const pmid = await deploy()
+
+    const [owner, rando] = await ethers.getSigners()
+    const uri = 'https://google.com'
+    const kycTx = await pmid.mintIdentityToken(rando.address, uri, ['kyc_clear'])
+    await kycTx.wait()
+
+    const accTx = await pmid.mintIdentityToken(rando.address, uri, ['accreditation'])
+    await accTx.wait()
+
+    // these traits should be true
+    expect(await pmid.hasUnexpiredTrait(rando.address, 'kyc_clear')).to.be.true
+    expect(await pmid.hasUnexpiredTrait(rando.address, 'accreditation')).to.be.true
+
+    // unexpected trait should be false
+    expect(await pmid.hasUnexpiredTrait(rando.address, 'blurp')).to.be.false
+
+    // the owner account has no token, so no traits, so this should be false
+    expect(await pmid.hasUnexpiredTrait(owner.address, 'kyc_clear')).to.be.false
+
+    // timetravel 91 days, when the tokens should now be expired
+    await fastForward(86400 * 91)
+    expect(await pmid.hasUnexpiredTrait(rando.address, 'kyc_clear')).to.be.false
+    expect(await pmid.hasUnexpiredTrait(rando.address, 'accreditation')).to.be.false
   })
 })

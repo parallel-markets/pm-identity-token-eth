@@ -14,12 +14,12 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    struct MetaData {
+    struct Metadata {
         uint _mintedAt;
         mapping(bytes32 => bool) _traits;
     }
 
-    mapping(uint256 => MetaData) private _metas;
+    mapping(uint256 => Metadata) private _metas;
 
     // solhint-disable-next-line no-empty-blocks
     constructor() ERC721("ParallelMarketsID", "PMID") {}
@@ -43,19 +43,19 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     function setApprovalForAll(address, bool) public virtual override {
         revert("ID Tokens cannot be transferred.");
     }
-    
-    function mintIdentity(address recipient, string memory tokenDataURI, string[] memory traits) external virtual onlyOwner returns (uint256) {
+
+    function mintIdentityToken(address recipient, string memory tokenDataURI, string[] memory traits) external virtual onlyOwner returns (uint256) {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
         _safeMint(recipient, newItemId);
         _setTokenURI(newItemId, tokenDataURI);
 
-        MetaData storage metas = _metas[newItemId];
-        metas._mintedAt = block.timestamp;
+        Metadata storage meta = _metas[newItemId];
+        meta._mintedAt = block.timestamp;
 
         for (uint i = 0; i < traits.length; i++) {
-            metas._traits[keccak256(abi.encode(traits[i]))] = true;
+            meta._traits[keccak256(abi.encode(traits[i]))] = true;
         }
 
         return newItemId;
@@ -70,19 +70,30 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         return _metas[tokenId]._mintedAt;
     }
 
-    function setTrait(uint256 tokenId, string memory trait, bool value) external virtual onlyOwner {
+    function setTrait(uint256 tokenId, string memory _trait, bool value) external virtual onlyOwner {
         require(_exists(tokenId), "Request for nonexistent token");
 
-        _metas[tokenId]._traits[keccak256(abi.encode(trait))] = value;
+        _metas[tokenId]._traits[keccak256(abi.encode(_trait))] = value;
 
-        emit TraitUpdated(tokenId, trait, value);
+        emit TraitUpdated(tokenId, _trait, value);
     }
-    
-    function getTrait(uint256 tokenId, string memory trait) public view virtual returns (bool) {
+
+    function trait(uint256 tokenId, string memory _trait) public view virtual returns (bool) {
         require(_exists(tokenId), "Request for nonexistent token");
 
-        bytes32 traitHash = keccak256(abi.encode(trait));
+        bytes32 traitHash = keccak256(abi.encode(_trait));
         return _metas[tokenId]._traits[traitHash];
+    }
+
+    function hasUnexpiredTrait(address owner, string memory _trait) public view virtual returns (bool) {
+        for (uint i = 0; i < balanceOf(owner); i++) {
+            uint256 tokenId = tokenOfOwnerByIndex(owner, i);
+            if (unexpired(tokenId) && trait(tokenId, _trait)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function tokenURI(uint256 tokenId) public view virtual override (ERC721, ERC721URIStorage) returns (string memory) {
@@ -108,11 +119,11 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
 
     function burn(uint256 tokenId) public virtual {
         require(_exists(tokenId), "Cannot burn nonexistent token");
-        
-        // if the message sender is the token owner or the contract owner, allow burning        
-        address tokenOwner = ERC721.ownerOf(tokenId);        
+
+        // if the message sender is the token owner or the contract owner, allow burning
+        address tokenOwner = ERC721.ownerOf(tokenId);
         require(_msgSender() == tokenOwner || _msgSender() == owner(), "Caller is not owner nor approved");
-        
+
         _burn(tokenId);
     }
 }
