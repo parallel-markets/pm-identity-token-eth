@@ -18,6 +18,9 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+// To see gas prices for other networks, see this page for options:
+// https://www.npmjs.com/package/hardhat-gas-reporter
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -44,6 +47,8 @@ module.exports = {
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: 'USD',
+    coinmarketcap: process.env.COIN_MARKET_CAP_KEY,
+    gasPriceApi: 'https://api.etherscan.io/api?module=proxy&action=eth_gasPrice',
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
