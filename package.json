@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "test": "pnpm lint && pnpm solhint 'contracts/**/*.sol' && hardhat test",
-    "lint": "eslint ./test hardhat.config.js ./scripts && prettier -l ./test hardhat.config.js ./scripts"
+    "lint": "eslint ./test hardhat.config.js ./scripts && prettier -l ./test hardhat.config.js ./scripts ./contracts",
+    "format": "prettier --write ./test hardhat.config.js ./scripts './contracts/**/*.sol'"
   },
   "license": "MIT",
   "devDependencies": {

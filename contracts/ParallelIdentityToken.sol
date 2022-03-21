@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
     event TraitUpdated(uint256 indexed tokenId, string trait, bool value);
 
@@ -15,7 +14,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     Counters.Counter private _tokenIds;
 
     struct Metadata {
-        uint _mintedAt;
+        uint256 _mintedAt;
         mapping(bytes32 => bool) _traits;
     }
 
@@ -24,11 +23,20 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     // solhint-disable-next-line no-empty-blocks
     constructor() ERC721("ParallelMarketsID", "PMID") {}
 
-    function safeTransferFrom(address, address, uint256, bytes memory) public virtual override(ERC721, IERC721) {
+    function safeTransferFrom(
+        address,
+        address,
+        uint256,
+        bytes memory
+    ) public virtual override(ERC721, IERC721) {
         revert("ID Tokens cannot be transferred.");
     }
 
-    function transferFrom(address, address, uint256) public virtual override(ERC721, IERC721)  {
+    function transferFrom(
+        address,
+        address,
+        uint256
+    ) public virtual override(ERC721, IERC721) {
         revert("ID Tokens cannot be transferred.");
     }
 
@@ -44,7 +52,11 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         revert("ID Tokens cannot be transferred.");
     }
 
-    function mintIdentityToken(address recipient, string memory tokenDataURI, string[] memory traits) external virtual onlyOwner returns (uint256) {
+    function mintIdentityToken(
+        address recipient,
+        string memory tokenDataURI,
+        string[] memory traits
+    ) external virtual onlyOwner returns (uint256) {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
@@ -54,7 +66,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         Metadata storage meta = _metas[newItemId];
         meta._mintedAt = block.timestamp;
 
-        for (uint i = 0; i < traits.length; i++) {
+        for (uint256 i = 0; i < traits.length; i++) {
             meta._traits[keccak256(abi.encode(traits[i]))] = true;
         }
 
@@ -65,12 +77,16 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         return mintedAt(tokenId) >= block.timestamp - 90 days;
     }
 
-    function mintedAt(uint256 tokenId) public view virtual returns (uint) {
+    function mintedAt(uint256 tokenId) public view virtual returns (uint256) {
         require(_exists(tokenId), "Request for nonexistent token");
         return _metas[tokenId]._mintedAt;
     }
 
-    function setTrait(uint256 tokenId, string memory _trait, bool value) external virtual onlyOwner {
+    function setTrait(
+        uint256 tokenId,
+        string memory _trait,
+        bool value
+    ) external virtual onlyOwner {
         require(_exists(tokenId), "Request for nonexistent token");
 
         _metas[tokenId]._traits[keccak256(abi.encode(_trait))] = value;
@@ -86,7 +102,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     }
 
     function hasUnexpiredTrait(address owner, string memory _trait) public view virtual returns (bool) {
-        for (uint i = 0; i < balanceOf(owner); i++) {
+        for (uint256 i = 0; i < balanceOf(owner); i++) {
             uint256 tokenId = tokenOfOwnerByIndex(owner, i);
             if (unexpired(tokenId) && trait(tokenId, _trait)) {
                 return true;
@@ -96,7 +112,7 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         return false;
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override (ERC721, ERC721URIStorage) returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
@@ -108,7 +124,11 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
         return super.supportsInterface(interfaceId);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override(ERC721, ERC721Enumerable) {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 

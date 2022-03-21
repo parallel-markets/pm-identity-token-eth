@@ -17,8 +17,6 @@
       "options": {
         "singleQuote": false,
         "semi": true,
-        "printWidth": 1000,
-        "bracketSpacing": false,
         "explicitTypes": "always"
       }
     }
