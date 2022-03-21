@@ -39,7 +39,7 @@ describe('ParallelMarketsID traits', function () {
     expect(await pmid.trait(tokenId, 'blurp')).to.be.false
 
     const now = Math.round(new Date().getTime() / 1000)
-    expect(await pmid.mintedAt(tokenId)).to.be.within(now - 10, now + 10)
+    expect(await pmid.mintedAt(tokenId)).to.be.within(now - 15, now + 15)
     expect(await pmid.tokenURI(tokenId)).to.equal(uri)
     expect(await pmid.unexpired(tokenId)).to.be.true
   })
