@@ -4,11 +4,22 @@
   "printWidth": 180,
   "semi": false,
   "singleQuote": true,
+  "plugins": ["prettier-plugin-solidity"],
   "overrides": [
     {
       "files": ["*.yml", "*.yaml"],
       "options": {
         "singleQuote": false
+      }
+    },
+    {
+      "files": ["*.sol"],
+      "options": {
+        "singleQuote": false,
+        "semi": true,
+        "printWidth": 1000,
+        "bracketSpacing": false,
+        "explicitTypes": "always"
       }
     }
   ]

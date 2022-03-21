@@ -24,23 +24,23 @@ contract ParallelMarketsID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownabl
     // solhint-disable-next-line no-empty-blocks
     constructor() ERC721("ParallelMarketsID", "PMID") {}
 
-    function safeTransferFrom(address, address, uint256, bytes memory) public virtual override {
+    function safeTransferFrom(address, address, uint256, bytes memory) public virtual override(ERC721, IERC721) {
         revert("ID Tokens cannot be transferred.");
     }
 
-    function transferFrom(address, address, uint256) public virtual override {
+    function transferFrom(address, address, uint256) public virtual override(ERC721, IERC721)  {
         revert("ID Tokens cannot be transferred.");
     }
 
-    function approve(address, uint256) public virtual override {
+    function approve(address, uint256) public virtual override(ERC721, IERC721) {
         revert("ID Tokens cannot be transferred.");
     }
 
-    function getApproved(uint256) public view virtual override returns (address) {
+    function getApproved(uint256) public view virtual override(ERC721, IERC721) returns (address) {
         revert("ID Tokens cannot be transferred.");
     }
 
-    function setApprovalForAll(address, bool) public virtual override {
+    function setApprovalForAll(address, bool) public virtual override(ERC721, IERC721) {
         revert("ID Tokens cannot be transferred.");
     }
 
