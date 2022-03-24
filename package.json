@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "test": "pnpm lint && pnpm solhint 'contracts/**/*.sol' && hardhat test",
-    "lint": "eslint ./test hardhat.config.js ./scripts && prettier -l ./test hardhat.config.js ./scripts"
+    "lint": "eslint ./test hardhat.config.js ./scripts && prettier -l ./test hardhat.config.js ./scripts './contracts/**/*.sol'",
+    "format": "prettier --write ./test hardhat.config.js ./scripts './contracts/**/*.sol'"
   },
   "license": "MIT",
   "devDependencies": {
@@ -23,11 +24,11 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "ethereum-waffle": "^4.0.0-alpha.0",
-    "ethers": "^5.6.0",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.1",
     "hardhat": "^2.9.1",
     "hardhat-gas-reporter": "^1.0.8",
-    "prettier": "^2.5.1",
+    "prettier": "^2.6.0",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.7.20"
