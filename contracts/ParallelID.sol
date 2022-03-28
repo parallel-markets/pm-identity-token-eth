@@ -88,6 +88,10 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         revert("PID Tokens cannot be transferred");
     }
 
+    function setMintCost(uint256 newCost) external virtual onlyOwner {
+        mintCost = newCost;
+    }
+
     function mint(
         address recipient,
         string memory tokenDataURI,

@@ -18,9 +18,34 @@ const getHolder = async () => {
 const SUBJECT_INDIVIDUAL = 0
 const SUBJECT_BUSINESS = 1
 
+const TOKEN_COST = ethers.utils.parseUnits('8500000', 'gwei')
+
+describe('Token mintCost', () => {
+  it('should be set correctly and public', async () => {
+    const pid = await deploy('ParallelID')
+    expect(await pid.mintCost()).to.equal(TOKEN_COST)
+  })
+
+  it('should be settable by the owner', async () => {
+    const pid = await deploy('ParallelID')
+    const newCost = ethers.utils.parseUnits('10', 'ether')
+    const tx = await pid.setMintCost(newCost)
+    await tx.wait()
+    expect(await pid.mintCost()).to.equal(newCost)
+  })
+
+  it('should not be settable by non-owners', async () => {
+    const pid = await deploy('ParallelID')
+    const signers = await ethers.getSigners()
+    const newCost = ethers.utils.parseUnits('10', 'ether')
+    const tx = pid.connect(signers[1]).setMintCost(newCost)
+    await expect(tx).to.be.revertedWith('Ownable: caller is not the owner')
+  })
+})
+
 describe('Token recipient minting', () => {
   const types = ['address', 'string', 'bytes32', 'uint16', 'uint16', 'uint256', 'address', 'uint256', 'uint']
-  const options = { value: ethers.utils.parseUnits('8500000', 'gwei') }
+  const options = { value: TOKEN_COST }
   const traits = ['kyc', 'aml', 'clear']
   const uri = 'cid://something'
 
@@ -75,7 +100,7 @@ describe('Token recipient minting', () => {
     const pid = await deploy('ParallelID')
     const [owner, rando] = await ethers.getSigners()
     const chainId = await owner.getChainId()
-    const nowish = now() + 20
+    const nowish = now() + 40
 
     const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
@@ -90,7 +115,7 @@ describe('Token recipient minting', () => {
     const pid = await deploy('ParallelID')
     const [owner, rando] = await ethers.getSigners()
     const chainId = await owner.getChainId()
-    const nowish = now() + 20
+    const nowish = now() + 40
 
     const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
