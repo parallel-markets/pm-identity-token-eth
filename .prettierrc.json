@@ -17,7 +17,8 @@
       "options": {
         "printWidth": 180,
         "explicitTypes": "always",
-        "singleQuote": false        
+        "singleQuote": false,
+        "semi": true   
       }
     }
   ]
