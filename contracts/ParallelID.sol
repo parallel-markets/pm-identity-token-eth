@@ -60,7 +60,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         uint256,
         bytes memory
     ) public virtual override {
-        revert("ID Tokens cannot be transferred.");
+        revert("PID Tokens cannot be transferred");
     }
 
     function transferFrom(
@@ -68,19 +68,19 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         address,
         uint256
     ) public virtual override {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function approve(address, uint256) public virtual override {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function getApproved(uint256) public view virtual override returns (address) {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function setApprovalForAll(address, bool) public virtual override {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function mint(
