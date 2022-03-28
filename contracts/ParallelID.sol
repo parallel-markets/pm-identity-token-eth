@@ -173,8 +173,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         return _metas[tokenId]._subjectType;
     }
 
-    function mintedAt(uint256 tokenId) public view virtual returns (uint256) {
-        require(_exists(tokenId), "Request for nonexistent token");
+    function mintedAt(uint256 tokenId) public view virtual exists(tokenId) returns (uint256) {
         return _metas[tokenId]._mintedAt;
     }
 
