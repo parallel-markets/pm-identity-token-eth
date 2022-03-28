@@ -155,8 +155,7 @@ describe('Contract owner minting', () => {
     expect(await pid.balanceOf(rando.address)).to.equal(1)
 
     // mintedAt should be now
-    const now = Math.round(new Date().getTime() / 1000)
-    expect(await pid.mintedAt(tokenId)).to.be.within(now - 30, now + 30)
+    expect(await pid.mintedAt(tokenId)).to.be.within(now() - 30, now() + 30)
 
     // citizenship
     expect(await pid.citizenship(tokenId)).to.equal(840)

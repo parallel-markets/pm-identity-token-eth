@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -64,7 +65,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         uint256,
         bytes memory
     ) public virtual override {
-        revert("ID Tokens cannot be transferred.");
+        revert("PID Tokens cannot be transferred");
     }
 
     function transferFrom(
@@ -72,23 +73,19 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         address,
         uint256
     ) public virtual override {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function approve(address, uint256) public virtual override {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function getApproved(uint256) public view virtual override returns (address) {
-        revert("ID Tokens cannot be transferred");
+        revert("PID Tokens cannot be transferred");
     }
 
     function setApprovalForAll(address, bool) public virtual override {
-        revert("ID Tokens cannot be transferred");
-    }
-
-    function setMintCost(uint256 cost) external virtual onlyOwner {
-        mintCost = cost;
+        revert("PID Tokens cannot be transferred");
     }
 
     function mint(
@@ -200,8 +197,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         return _metas[tokenId]._subjectType;
     }
 
-    function mintedAt(uint256 tokenId) public view virtual returns (uint256) {
-        require(_exists(tokenId), "Request for nonexistent token");
+    function mintedAt(uint256 tokenId) public view virtual exists(tokenId) returns (uint256) {
         return _metas[tokenId]._mintedAt;
     }
 
