@@ -12,4 +12,6 @@ const fastForward = async (seconds) => {
   await ethers.provider.send('evm_mine')
 }
 
-module.exports = { deploy, fastForward }
+const now = () => Math.ceil(new Date().getTime() / 1000)
+
+module.exports = { deploy, fastForward, now }

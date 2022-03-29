@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -41,7 +43,6 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
 
     struct Metadata {
         uint256 _mintedAt;
-        uint256 _renewedAt;
         uint16 _subjectType;
         uint16 _citizenship;
         bool _anySanctions;
@@ -50,6 +51,10 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
     }
 
     mapping(uint256 => Metadata) private _metas;
+
+    mapping(address => uint256) public nonces;
+
+    uint256 public mintCost = 8500000 gwei;
 
     // solhint-disable-next-line no-empty-blocks
     constructor() ERC721("ParallelID", "PID") {}
@@ -83,6 +88,10 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         revert("PID Tokens cannot be transferred");
     }
 
+    function setMintCost(uint256 newCost) external virtual onlyOwner {
+        mintCost = newCost;
+    }
+
     function mint(
         address recipient,
         string memory tokenDataURI,
@@ -90,6 +99,48 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         uint16 _subjectType,
         uint16 _citizenship
     ) external virtual onlyOwner returns (uint256) {
+        return _mint(recipient, tokenDataURI, _traits, _subjectType, _citizenship);
+    }
+
+    function hashStrings(string[] memory words) public pure returns (bytes32) {
+        bytes memory result;
+
+        for (uint256 i = 0; i < words.length; i++) {
+            result = abi.encodePacked(result, words[i], "\x00");
+        }
+
+        return keccak256(result);
+    }
+
+    function recipientMint(
+        string memory tokenDataURI,
+        string[] memory _traits,
+        uint16 _subjectType,
+        uint16 _citizenship,
+        uint256 expiresAt,
+        bytes calldata signature
+    ) external payable virtual returns (uint256) {
+        require(block.timestamp < expiresAt, "Signature has expired");
+        require(msg.value >= mintCost, "Sufficient payment required");
+
+        bytes32 hashedTraits = hashStrings(_traits);
+        address account = _msgSender();
+        nonces[account] += 1;
+
+        bytes32 hash = keccak256(abi.encodePacked(account, tokenDataURI, hashedTraits, _subjectType, _citizenship, expiresAt, address(this), nonces[account], block.chainid));
+        bytes32 ethSignedMessage = ECDSA.toEthSignedMessageHash(hash);
+
+        require(owner() == ECDSA.recover(ethSignedMessage, signature), "Invalid signature");
+        return _mint(account, tokenDataURI, _traits, _subjectType, _citizenship);
+    }
+
+    function _mint(
+        address recipient,
+        string memory tokenDataURI,
+        string[] memory _traits,
+        uint16 _subjectType,
+        uint16 _citizenship
+    ) internal virtual returns (uint256) {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
@@ -109,31 +160,8 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         return newItemId;
     }
 
-    function renew(
-        uint256 tokenId,
-        string memory tokenDataURI,
-        string[] memory _traits,
-        uint16 _citizenship
-    ) external virtual onlyOwner exists(tokenId) {
-        _setTokenURI(tokenId, tokenDataURI);
-        Metadata storage meta = _metas[tokenId];
-        meta._renewedAt = block.timestamp;
-        meta._citizenship = _citizenship;
-
-        // clear all traits
-        for (uint256 i = 0; i < _traitsIndex.length(); i++) {
-            if (meta._traits.get(i)) meta._traits.unset(i);
-        }
-
-        for (uint256 i = 0; i < _traits.length; i++) {
-            uint256 index = _traitsIndex.add(_traits[i]);
-            meta._traits.set(index);
-        }
-    }
-
-    function lastIssuedAt(uint256 tokenId) public view virtual exists(tokenId) returns (uint256) {
-        uint256 renewedAt = _metas[tokenId]._renewedAt;
-        return renewedAt > 0 ? renewedAt : _metas[tokenId]._mintedAt;
+    function withdraw() external virtual onlyOwner {
+        payable(owner()).transfer(address(this).balance);
     }
 
     function addSanctions(uint256 tokenId, uint256 countryId) external virtual onlyOwner exists(tokenId) {
@@ -146,10 +174,10 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
     }
 
     function isSanctionsMonitored(uint256 tokenId) public view virtual exists(tokenId) returns (bool) {
-        return lastIssuedAt(tokenId) >= block.timestamp - 365 days;
+        return mintedAt(tokenId) >= block.timestamp - 365 days;
     }
 
-    function isSanctionsSafe(uint256 tokenId) public view virtual exists(tokenId) returns (bool) {
+    function isSanctionsSafe(uint256 tokenId) external view virtual exists(tokenId) returns (bool) {
         return (isSanctionsMonitored(tokenId) && !_metas[tokenId]._anySanctions);
     }
 
@@ -161,15 +189,15 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
      * @param tokenId Numeric token id
      * @param countryId ISO 3316 numeric country code (see https://en.wikipedia.org/wiki/ISO_3166-1_numeric)
      */
-    function isSanctionsSafeIn(uint256 tokenId, uint256 countryId) public view virtual exists(tokenId) returns (bool) {
+    function isSanctionsSafeIn(uint256 tokenId, uint256 countryId) external view virtual exists(tokenId) returns (bool) {
         return (isSanctionsMonitored(tokenId) && !_metas[tokenId]._sanctions.get(countryId));
     }
 
-    function citizenship(uint256 tokenId) public view virtual exists(tokenId) returns (uint16) {
+    function citizenship(uint256 tokenId) external view virtual exists(tokenId) returns (uint16) {
         return _metas[tokenId]._citizenship;
     }
 
-    function subjectType(uint256 tokenId) public view virtual exists(tokenId) returns (uint16) {
+    function subjectType(uint256 tokenId) external view virtual exists(tokenId) returns (uint16) {
         return _metas[tokenId]._subjectType;
     }
 
@@ -196,14 +224,14 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         }
     }
 
-    function hasTrait(uint256 tokenId, string memory trait) public view virtual exists(tokenId) returns (bool) {
+    function hasTrait(uint256 tokenId, string memory trait) external view virtual exists(tokenId) returns (bool) {
         (bool found, uint256 index) = _traitsIndex.indexOf(trait);
         return found ? _metas[tokenId]._traits.get(index) : false;
     }
 
     // @dev This may be very expensive, especially if the total number of available traits
     // gets large.
-    function traits(uint256 tokenId) public view virtual exists(tokenId) returns (string[] memory) {
+    function traits(uint256 tokenId) external view virtual exists(tokenId) returns (string[] memory) {
         // The following logic is nice and fun, but is necessary so we always allocate a set
         // amount of memory necessary at each stage.
 
@@ -262,7 +290,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         delete _metas[tokenId];
     }
 
-    function burn(uint256 tokenId) public virtual exists(tokenId) {
+    function burn(uint256 tokenId) external virtual exists(tokenId) {
         // if the message sender is the token owner or the contract owner, allow burning
         address tokenOwner = ERC721.ownerOf(tokenId);
         require(_msgSender() == tokenOwner || _msgSender() == owner(), "Caller is not owner nor approved");
