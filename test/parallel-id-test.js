@@ -72,7 +72,7 @@ describe('Token recipient minting', () => {
     const pid = await deploy('ParallelID')
     const [owner, rando] = await ethers.getSigners()
     const chainId = await owner.getChainId()
-    const nowish = now() + 20
+    const nowish = now() + 40
 
     const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
@@ -86,7 +86,7 @@ describe('Token recipient minting', () => {
     const pid = await deploy('ParallelID')
     const [owner, rando] = await ethers.getSigners()
     const chainId = await owner.getChainId()
-    const nowish = now() + 20
+    const nowish = now() + 40
 
     const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
@@ -180,7 +180,7 @@ describe('Contract owner minting', () => {
     expect(await pid.balanceOf(rando.address)).to.equal(1)
 
     // mintedAt should be now
-    expect(await pid.mintedAt(tokenId)).to.be.within(now() - 30, now() + 30)
+    expect(await pid.mintedAt(tokenId)).to.be.within(now() - 40, now() + 40)
 
     // citizenship
     expect(await pid.citizenship(tokenId)).to.equal(840)

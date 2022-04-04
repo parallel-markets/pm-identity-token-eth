@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/structs/BitMapsUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./IParallelID.sol";
 import "./utils/OrderedStringSet.sol";
@@ -18,14 +19,14 @@ import "./utils/OrderedStringSet.sol";
  * @author Parallel Markets Engineering Team
  * @dev See https://developer.parallelmarkets.com/docs/token for detailed documentation
  */
-contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IParallelID {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721EnumerableUpgradeable, OwnableUpgradeable, IParallelID {
+    using CountersUpgradeable for CountersUpgradeable.Counter;
+    CountersUpgradeable.Counter private _tokenIds;
 
     using OrderedStringSets for OrderedStringSets.OrderedStringSet;
     OrderedStringSets.OrderedStringSet private _traitsIndex;
 
-    using BitMaps for BitMaps.BitMap;
+    using BitMapsUpgradeable for BitMapsUpgradeable.BitMap;
 
     uint16 public constant SUBJECT_INDIVIDUAL = 0;
     uint16 public constant SUBJECT_BUSINESS = 1;
@@ -35,46 +36,51 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IPar
         uint16 _subjectType;
         uint16 _citizenship;
         bool _anySanctions;
-        BitMaps.BitMap _traits;
-        BitMaps.BitMap _sanctions;
+        BitMapsUpgradeable.BitMap _traits;
+        BitMapsUpgradeable.BitMap _sanctions;
     }
 
     mapping(uint256 => Metadata) private _metas;
 
     mapping(address => uint256) public nonces;
 
-    uint256 public mintCost = 8500000 gwei;
+    uint256 public mintCost;
 
-    // solhint-disable-next-line no-empty-blocks
-    constructor() ERC721("ParallelID", "PID") {}
+    function initialize() public initializer {
+        mintCost = 8500000 gwei;
+        __ERC721_init("ParallelID", "PID");
+        __ERC721URIStorage_init();
+        __ERC721Enumerable_init();
+        __Ownable_init();
+    }
 
     function safeTransferFrom(
         address,
         address,
         uint256,
         bytes memory
-    ) public virtual override(IERC721, ERC721) {
-        revert("PID Tokens cannot be transferred");
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
+        noop();
     }
 
     function transferFrom(
         address,
         address,
         uint256
-    ) public virtual override(IERC721, ERC721) {
-        revert("PID Tokens cannot be transferred");
+    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
+        noop();
     }
 
-    function approve(address, uint256) public virtual override(IERC721, ERC721) {
-        revert("PID Tokens cannot be transferred");
+    function approve(address, uint256) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
+        noop();
     }
 
-    function getApproved(uint256) public view virtual override(IERC721, ERC721) returns (address) {
-        revert("PID Tokens cannot be transferred");
+    function getApproved(uint256) public view virtual override(IERC721Upgradeable, ERC721Upgradeable) returns (address) {
+        noop();
     }
 
-    function setApprovalForAll(address, bool) public virtual override(IERC721, ERC721) {
-        revert("PID Tokens cannot be transferred");
+    function setApprovalForAll(address, bool) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
+        noop();
     }
 
     function setMintCost(uint256 newCost) external virtual onlyOwner {
@@ -117,9 +123,9 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IPar
         nonces[account] += 1;
 
         bytes32 hash = keccak256(abi.encodePacked(account, tokenDataURI, hashedTraits, _subjectType, _citizenship, expiresAt, address(this), nonces[account], block.chainid));
-        bytes32 ethSignedMessage = ECDSA.toEthSignedMessageHash(hash);
+        bytes32 ethSignedMessage = ECDSAUpgradeable.toEthSignedMessageHash(hash);
 
-        require(owner() == ECDSA.recover(ethSignedMessage, signature), "Invalid signature");
+        require(owner() == ECDSAUpgradeable.recover(ethSignedMessage, signature), "Invalid signature");
         return _mint(account, tokenDataURI, _traits, _subjectType, _citizenship);
     }
 
@@ -215,7 +221,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IPar
         // amount of memory necessary at each stage.
 
         // this will be the token traits bitmap
-        BitMaps.BitMap storage tokenTraits = _metas[tokenId]._traits;
+        BitMapsUpgradeable.BitMap storage tokenTraits = _metas[tokenId]._traits;
 
         // this makes a variable to hold a list of all indexes in the _traitsIndex that
         // are set in the tokenTraits bitmap.  We initialize it to be the size of the whole
@@ -244,7 +250,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IPar
         return result;
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage, IERC721Metadata) returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721Upgradeable, ERC721URIStorageUpgradeable, IERC721MetadataUpgradeable) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
@@ -252,7 +258,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IPar
         _setTokenURI(tokenId, _tokenURI);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721, ERC721Enumerable) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165Upgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -260,25 +266,29 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IPar
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(ERC721, ERC721Enumerable) {
+    ) internal virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function _burn(uint256 tokenId) internal virtual override(ERC721, ERC721URIStorage) {
+    function _burn(uint256 tokenId) internal virtual override(ERC721Upgradeable, ERC721URIStorageUpgradeable) {
         super._burn(tokenId);
         delete _metas[tokenId];
     }
 
     function burn(uint256 tokenId) external virtual exists(tokenId) {
         // if the message sender is the token owner or the contract owner, allow burning
-        address tokenOwner = ERC721.ownerOf(tokenId);
-        require(_msgSender() == tokenOwner || _msgSender() == owner(), "Caller is not owner nor approved");
+        address tokenOwner = ERC721Upgradeable.ownerOf(tokenId);
+        require(_msgSender() == tokenOwner || _msgSender() == owner(), "Caller cannot burn");
 
         _burn(tokenId);
     }
 
     modifier exists(uint256 tokenId) {
-        require(_exists(tokenId), "Request for nonexistent token");
+        require(_exists(tokenId), "Nonexistent token");
         _;
+    }
+
+    function noop() internal pure virtual {
+        revert("PID Tokens cannot be transferred");
     }
 }
