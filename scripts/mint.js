@@ -3,7 +3,9 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-const hre = require('hardhat')
+const { ethers } = require('hardhat')
+
+const SUBJECT_INDIVIDUAL = 0
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -14,12 +16,13 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const ParallelMarketsID = await hre.ethers.getContractFactory('ParallelMarketsID')
-  const pmid = await ParallelMarketsID.attach('0xb31317ad3BD8e188D3848713b88ddC76C977e4C6')
+  const factory = await ethers.getContractFactory('ParallelID')
+  const contract = await factory.attach('0x91E498A0a9B47EEA5F8ba6c2553789BacbBED561')
 
+  const uri = 'ipfs://QmPdP2Uw3nEUojBujVf9XqCrxxRhsXrxxMJ7ZipURunXUp'
   const addy = '0xf0495779260E786409c2ee6B85cE6Ef7B07377F8'
-  const uri = 'https://parallelmarkets.com/token.json'
-  await pmid.mintIdentityToken(addy, uri, ['kyc_clear', 'accredited'])
+
+  await contract.mint(addy, uri, ['kyc'], SUBJECT_INDIVIDUAL, 840)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
