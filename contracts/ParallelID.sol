@@ -19,6 +19,7 @@ import "./utils/OrderedStringSet.sol";
  * @author Parallel Markets Engineering Team
  * @dev See https://developer.parallelmarkets.com/docs/token for detailed documentation
  */
+
 contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721EnumerableUpgradeable, OwnableUpgradeable, IParallelID {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIds;
