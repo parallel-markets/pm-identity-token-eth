@@ -4,6 +4,7 @@ require('@nomiclabs/hardhat-etherscan')
 require('@nomiclabs/hardhat-waffle')
 require('hardhat-gas-reporter')
 require('solidity-coverage')
+require('@openzeppelin/hardhat-upgrades')
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -29,7 +30,7 @@ module.exports = {
     version: '0.8.9',
     settings: {
       optimizer: {
-        enabled: process.env.OPTIMIZE === '1',
+        enabled: process.env.OPTIMIZE !== undefined,
         runs: 1000,
       },
     },

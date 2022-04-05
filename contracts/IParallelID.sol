@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol";
 
 /*
  * @title The Parallel Identity Token (PID) interface
  * @author Parallel Markets Engineering Team
  * @dev See https://developer.parallelmarkets.com/docs/token for detailed documentation
  */
-interface IParallelID is IERC721, IERC721Metadata, IERC721Enumerable {
+interface IParallelID is IERC721Upgradeable, IERC721MetadataUpgradeable, IERC721EnumerableUpgradeable {
     /*
      * @notice This event is emitted when a trait is added to a token for the first time.
      */

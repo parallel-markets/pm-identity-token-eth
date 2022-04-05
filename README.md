@@ -19,14 +19,14 @@ This will run all tests / linters:
 Use this to see what current costs are for contract calls:
 
 ```shell
-> REPORT_GAS=true pnpm exec hardhat test
+> OPTIMIZE=true REPORT_GAS=true pnpm exec hardhat test
 ```
 
 ## Deployment
 Ensure the network you'd like to deploy to is configured in `hardhat.config.js`, then run:
 
 ```shell
-> pnpm exec hardhat run --network <network name> scripts/deploy.js
+> OPTIMIZE=true pnpm exec hardhat run --network <network name> scripts/deploy.js
 ```
 
 ### Issuing Tokens
@@ -40,7 +40,7 @@ Edit the `scripts/mint.js` file with the address of the contract and token recip
 After deploying, run:
 
 ```shell
-npx hardhat verify --network <network name> <contract address>
+pnpm exec hardhat verify --network <network name> <contract address>
 ```
 
 This will verify the contract on Etherscan (so everyone can see the source code).

@@ -1,8 +1,8 @@
-const { ethers } = require('hardhat')
+const { ethers, upgrades } = require('hardhat')
 
 const deploy = async (contractName) => {
-  const factory = await ethers.getContractFactory(contractName)
-  const contract = await factory.deploy()
+  const ParallelID = await ethers.getContractFactory(contractName)
+  const contract = await upgrades.deployProxy(ParallelID, [])
   await contract.deployed()
   return contract
 }
