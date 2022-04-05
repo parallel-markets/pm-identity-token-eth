@@ -10,26 +10,15 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "./IParallelID.sol";
 import "./utils/OrderedStringSet.sol";
 
 /*
  * @title The Parallel Identity Token (PID)
  * @author Parallel Markets Engineering Team
+ * @dev See https://developer.parallelmarkets.com/docs/token for detailed documentation
  */
-contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
-    // Emitted when a trait is added to token for the first time
-    event TraitAdded(uint256 indexed tokenId, string trait);
-
-    // Emitted when a trait is removed from a token
-    event TraitRemoved(uint256 indexed tokenId, string trait);
-
-    /*
-     * @notice Emitted when there's a sanctions match in a monitored country
-     * @param tokenId Numeric token id
-     * @param countryId ISO 3316 numeric country code (see https://en.wikipedia.org/wiki/ISO_3166-1_numeric)
-     */
-    event SanctionsMatch(uint256 indexed tokenId, uint256 countryId);
-
+contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable, IParallelID {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -64,7 +53,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         address,
         uint256,
         bytes memory
-    ) public virtual override {
+    ) public virtual override(IERC721, ERC721) {
         revert("PID Tokens cannot be transferred");
     }
 
@@ -72,19 +61,19 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         address,
         address,
         uint256
-    ) public virtual override {
+    ) public virtual override(IERC721, ERC721) {
         revert("PID Tokens cannot be transferred");
     }
 
-    function approve(address, uint256) public virtual override {
+    function approve(address, uint256) public virtual override(IERC721, ERC721) {
         revert("PID Tokens cannot be transferred");
     }
 
-    function getApproved(uint256) public view virtual override returns (address) {
+    function getApproved(uint256) public view virtual override(IERC721, ERC721) returns (address) {
         revert("PID Tokens cannot be transferred");
     }
 
-    function setApprovalForAll(address, bool) public virtual override {
+    function setApprovalForAll(address, bool) public virtual override(IERC721, ERC721) {
         revert("PID Tokens cannot be transferred");
     }
 
@@ -181,14 +170,6 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         return (isSanctionsMonitored(tokenId) && !_metas[tokenId]._anySanctions);
     }
 
-    /*
-     * @notice Use this to determine if the token holder is (1) still monitored for sanctions and doesn't
-     * have any known sanctions for the given country. For a list of monitored countries, see the Parallel
-     * developer docs.
-     *
-     * @param tokenId Numeric token id
-     * @param countryId ISO 3316 numeric country code (see https://en.wikipedia.org/wiki/ISO_3166-1_numeric)
-     */
     function isSanctionsSafeIn(uint256 tokenId, uint256 countryId) external view virtual exists(tokenId) returns (bool) {
         return (isSanctionsMonitored(tokenId) && !_metas[tokenId]._sanctions.get(countryId));
     }
@@ -229,8 +210,6 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         return found ? _metas[tokenId]._traits.get(index) : false;
     }
 
-    // @dev This may be very expensive, especially if the total number of available traits
-    // gets large.
     function traits(uint256 tokenId) external view virtual exists(tokenId) returns (string[] memory) {
         // The following logic is nice and fun, but is necessary so we always allocate a set
         // amount of memory necessary at each stage.
@@ -265,7 +244,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         return result;
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage, IERC721Metadata) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
@@ -273,7 +252,7 @@ contract ParallelID is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
         _setTokenURI(tokenId, _tokenURI);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC721Enumerable) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
