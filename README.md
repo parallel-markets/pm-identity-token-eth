@@ -9,6 +9,8 @@ The PID Token has a number of features:
  1. Tokens can contain additional _traits_, including accreditation status and other DeFi-related information
  1. While **no PII is stored in the Token**, every Token holder has gone through a [rigorous KYC process](https://developer.parallelmarkets.com/docs/token#know-your-customer), including for any business/corporate entity that owns the wallet
 
+See our [Developer Docs](https://developer.parallelmarkets.com/docs/token) for more information.
+
 ## Getting Started
 
 You can access PID Token information either directly on-chain on the Ethereum Mainnet or via one of the Web3 JavaScript libraries.
