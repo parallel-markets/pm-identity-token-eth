@@ -1,15 +1,15 @@
 {
-  "name": "pm-identity-token-eth",
+  "name": "@parallelmarkets/token",
   "version": "0.0.1",
-  "description": "The Parallel Markets Identity Token (IDT) on Ethereum",
-  "main": "index.js",
-  "private": true,
+  "description": "The Parallel Markets Identity Token (PID)",
+  "author": "Parallel Markets (https://parallelmarkets.com)",
+  "license": "MIT",
+  "homepage": "https://developer.parallelmarkets.com/docs/token",
   "scripts": {
     "test": "pnpm lint && pnpm solhint 'contracts/**/*.sol' && hardhat test",
     "lint": "eslint ./test hardhat.config.js ./scripts && prettier -l ./test hardhat.config.js ./scripts './contracts/**/*.sol'",
     "format": "prettier --write ./test hardhat.config.js ./scripts './contracts/**/*.sol'"
   },
-  "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
@@ -33,5 +33,15 @@
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.7.20"
-  }
+  },
+  "files": [
+    "contracts"
+  ],
+  "keywords": [
+    "ParallelMarkets",
+    "KYC",
+    "KYB",
+    "Token",
+    "NFT"
+  ]
 }
