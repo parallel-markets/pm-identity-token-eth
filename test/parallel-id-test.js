@@ -3,9 +3,9 @@ const { ethers } = require('hardhat')
 
 const { deploy, fastForward, now } = require('./utils')
 
-const mint = async (addy, uri, traits, subjectType, citizenship) => {
+const mint = async (addy, uri, traits, subjectType) => {
   const pid = await deploy('ParallelID')
-  const mintTx = await pid.mint(addy, uri, traits, subjectType, citizenship)
+  const mintTx = await pid.mint(addy, uri, traits, subjectType)
   await mintTx.wait()
   return pid
 }
@@ -44,7 +44,7 @@ describe('Token mintCost', () => {
 })
 
 describe('Token recipient minting', () => {
-  const types = ['address', 'string', 'bytes32', 'uint16', 'uint16', 'uint256', 'address', 'uint256', 'uint']
+  const types = ['address', 'string', 'bytes32', 'uint16', 'uint256', 'address', 'uint256', 'uint']
   const options = { value: TOKEN_COST }
   const traits = ['kyc', 'aml', 'clear']
   const uri = 'cid://something'
@@ -60,11 +60,11 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() + 20
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await owner.signMessage(ethers.utils.arrayify(encoded))
 
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, options)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, options)
     await expect(mintTx).to.emit(pid, 'Transfer').withArgs(ethers.constants.AddressZero, rando.address, 1)
   })
 
@@ -74,11 +74,11 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() + 40
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await rando.signMessage(ethers.utils.arrayify(encoded))
 
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, options)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, options)
     await expect(mintTx).to.be.revertedWith('Invalid signature')
   })
 
@@ -88,11 +88,11 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() + 40
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await owner.signMessage(ethers.utils.arrayify(encoded))
 
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_BUSINESS, 840, nowish, signature, options)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_BUSINESS, nowish, signature, options)
     await expect(mintTx).to.be.revertedWith('Invalid signature')
   })
 
@@ -102,12 +102,12 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() + 40
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await owner.signMessage(ethers.utils.arrayify(encoded))
 
     const lowValue = { value: ethers.utils.parseUnits('8499999', 'gwei') }
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, lowValue)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, lowValue)
     await expect(mintTx).to.be.revertedWith('Sufficient payment required')
   })
 
@@ -117,14 +117,14 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() + 40
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await owner.signMessage(ethers.utils.arrayify(encoded))
 
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, options)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, options)
     await expect(mintTx).to.emit(pid, 'Transfer').withArgs(ethers.constants.AddressZero, rando.address, 1)
 
-    const reTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, options)
+    const reTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, options)
     await expect(reTx).to.be.revertedWith('Invalid signature')
   })
 
@@ -134,11 +134,11 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() - 10
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await owner.signMessage(ethers.utils.arrayify(encoded))
 
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, options)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, options)
     await expect(mintTx).to.be.revertedWith('Signature has expired')
   })
 
@@ -148,14 +148,14 @@ describe('Token recipient minting', () => {
     const chainId = await owner.getChainId()
     const nowish = now() + 100
 
-    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, 840, nowish, pid.address, 1, chainId]
+    const values = [rando.address, uri, hashStrings(traits), SUBJECT_INDIVIDUAL, nowish, pid.address, 1, chainId]
     const encoded = ethers.utils.solidityKeccak256(types, values)
     const signature = await owner.signMessage(ethers.utils.arrayify(encoded))
 
     // contract shouldn't have any value yet
     expect(await rando.provider.getBalance(pid.address)).to.equal(0)
 
-    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, 840, nowish, signature, options)
+    const mintTx = pid.connect(rando).recipientMint(uri, traits, SUBJECT_INDIVIDUAL, nowish, signature, options)
     await expect(mintTx).to.emit(pid, 'Transfer').withArgs(ethers.constants.AddressZero, rando.address, 1)
 
     // contract should now have value
@@ -169,7 +169,7 @@ describe('Token recipient minting', () => {
 describe('Contract owner minting', () => {
   it('should initialize metadata correctly', async () => {
     const [owner, rando] = await ethers.getSigners()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
 
     // the owner should have nothing
     expect(await pid.balanceOf(owner.address)).to.equal(0)
@@ -182,9 +182,6 @@ describe('Contract owner minting', () => {
     // mintedAt should be now
     expect(await pid.mintedAt(tokenId)).to.be.within(now() - 40, now() + 40)
 
-    // citizenship
-    expect(await pid.citizenship(tokenId)).to.equal(840)
-
     // subjectType
     expect(await pid.subjectType(tokenId)).to.equal(SUBJECT_INDIVIDUAL)
 
@@ -194,7 +191,7 @@ describe('Contract owner minting', () => {
 
   it('should initialize traits correctly', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc', 'aml'], SUBJECT_BUSINESS, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc', 'aml'], SUBJECT_BUSINESS)
 
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
@@ -208,7 +205,7 @@ describe('Contract owner minting', () => {
 describe('Sanctions', () => {
   it('should start off empty and sanctions free', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     expect(await pid.isSanctionsSafe(tokenId)).to.be.true
@@ -217,7 +214,7 @@ describe('Sanctions', () => {
 
   it('should not be sanctions safe after end of monitoring', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     expect(await pid.isSanctionsSafe(tokenId)).to.be.true
@@ -232,7 +229,7 @@ describe('Sanctions', () => {
 
   it('should support adding sanctions with emmitted event', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     // check SanctionsMatch event
@@ -247,7 +244,7 @@ describe('Sanctions', () => {
 
   it('should know whether or not monitoring is current', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     expect(await pid.isSanctionsMonitored(tokenId)).to.be.true
@@ -262,7 +259,7 @@ describe('Sanctions', () => {
 describe('Traits', () => {
   it('should support additions and emit events', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     // check TraitAdded event
@@ -276,7 +273,7 @@ describe('Traits', () => {
 
   it('should support removals', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc', 'aml'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc', 'aml'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     // check TraitRemoved event
@@ -291,7 +288,7 @@ describe('Traits', () => {
 describe('Burning', () => {
   it('should be possible by the contract owner', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     expect(await pid.balanceOf(rando.address)).to.equal(1)
@@ -301,7 +298,7 @@ describe('Burning', () => {
 
   it('should be possible by the token holder', async () => {
     const rando = await getHolder()
-    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL, 840)
+    const pid = await mint(rando.address, 'uri', ['kyc'], SUBJECT_INDIVIDUAL)
     const tokenId = await pid.tokenOfOwnerByIndex(rando.address, 0)
 
     expect(await pid.balanceOf(rando.address)).to.equal(1)
