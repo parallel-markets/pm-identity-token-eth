@@ -32,7 +32,6 @@ interface IParallelID is IERC721Upgradeable, IERC721MetadataUpgradeable, IERC721
         string memory tokenDataURI,
         string[] memory _traits,
         uint16 _subjectType,
-        uint16 _citizenship,
         uint256 expiresAt,
         bytes calldata signature
     ) external payable returns (uint256);
@@ -57,12 +56,6 @@ interface IParallelID is IERC721Upgradeable, IERC721MetadataUpgradeable, IERC721
      *     given country / region.
      */
     function isSanctionsSafeIn(uint256 tokenId, uint256 countryId) external view returns (bool);
-
-    /*
-     * @return The ISO 3166 country code for the token holder's country of incorporation (if a
-     *     business / corporate entity) or country of citizenship (if an individual).
-     */
-    function citizenship(uint256 tokenId) external view returns (uint16);
 
     /*
      * @notice Get the entity type for the token holder

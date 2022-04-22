@@ -35,7 +35,6 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
     struct Metadata {
         uint256 _mintedAt;
         uint16 _subjectType;
-        uint16 _citizenship;
         bool _anySanctions;
         BitMapsUpgradeable.BitMap _traits;
         BitMapsUpgradeable.BitMap _sanctions;
@@ -92,10 +91,9 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         address recipient,
         string memory tokenDataURI,
         string[] memory _traits,
-        uint16 _subjectType,
-        uint16 _citizenship
+        uint16 _subjectType
     ) external virtual onlyOwner returns (uint256) {
-        return _mint(recipient, tokenDataURI, _traits, _subjectType, _citizenship);
+        return _mint(recipient, tokenDataURI, _traits, _subjectType);
     }
 
     function hashStrings(string[] memory words) public pure returns (bytes32) {
@@ -112,7 +110,6 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         string memory tokenDataURI,
         string[] memory _traits,
         uint16 _subjectType,
-        uint16 _citizenship,
         uint256 expiresAt,
         bytes calldata signature
     ) external payable virtual returns (uint256) {
@@ -123,19 +120,18 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         address account = _msgSender();
         nonces[account] += 1;
 
-        bytes32 hash = keccak256(abi.encodePacked(account, tokenDataURI, hashedTraits, _subjectType, _citizenship, expiresAt, address(this), nonces[account], block.chainid));
+        bytes32 hash = keccak256(abi.encodePacked(account, tokenDataURI, hashedTraits, _subjectType, expiresAt, address(this), nonces[account], block.chainid));
         bytes32 ethSignedMessage = ECDSAUpgradeable.toEthSignedMessageHash(hash);
 
         require(owner() == ECDSAUpgradeable.recover(ethSignedMessage, signature), "Invalid signature");
-        return _mint(account, tokenDataURI, _traits, _subjectType, _citizenship);
+        return _mint(account, tokenDataURI, _traits, _subjectType);
     }
 
     function _mint(
         address recipient,
         string memory tokenDataURI,
         string[] memory _traits,
-        uint16 _subjectType,
-        uint16 _citizenship
+        uint16 _subjectType
     ) internal virtual returns (uint256) {
         _tokenIds.increment();
 
@@ -146,7 +142,6 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         Metadata storage meta = _metas[newItemId];
         meta._mintedAt = block.timestamp;
         meta._subjectType = _subjectType;
-        meta._citizenship = _citizenship;
 
         for (uint256 i = 0; i < _traits.length; i++) {
             uint256 index = _traitsIndex.add(_traits[i]);
@@ -179,10 +174,6 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
 
     function isSanctionsSafeIn(uint256 tokenId, uint256 countryId) external view virtual exists(tokenId) returns (bool) {
         return (isSanctionsMonitored(tokenId) && !_metas[tokenId]._sanctions.get(countryId));
-    }
-
-    function citizenship(uint256 tokenId) external view virtual exists(tokenId) returns (uint16) {
-        return _metas[tokenId]._citizenship;
     }
 
     function subjectType(uint256 tokenId) external view virtual exists(tokenId) returns (uint16) {
