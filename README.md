@@ -24,7 +24,7 @@ import "@parallelmarkets/token/contracts/IParallelID.sol";
 
 contract MyContract {
     // Address on the Rinkeby test network
-    address PID_CONTRACT = "0x91E498A0a9B47EEA5F8ba6c2553789BacbBED561";
+    address PID_CONTRACT = "0x6737fAA302d607e0e3B06C51E3b5D28c5624F96A";
 
     function isSanctionsSafe(address subject) returns (bool) {
         // Get a handle for the Parallel Identity Token contract
@@ -72,7 +72,7 @@ const abi = [
 ]
 
 // Address on the Rinkeby test network
-const PID_CONTRACT = "0x91E498A0a9B47EEA5F8ba6c2553789BacbBED561"
+const PID_CONTRACT = "0x6737fAA302d607e0e3B06C51E3b5D28c5624F96A"
 const contract = new Contract(PID_CONTRACT, abi, provider)
 
 const isSanctionsSafe = (address) => {

@@ -1,20 +1,20 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0xCBeDE0F82Eb595D4F0C1F4b3FB89881683ac1715",
-    "txHash": "0xcdac18c2e66c9aa3ca27afd0659bdb8c04b7e61cd22e785a0039d7c3922afd75"
+    "address": "0x71268336e169576eb864ae69C5bA1e21AE6c12CD",
+    "txHash": "0xdffe88883ee954f8f2f10b08eaf096654b6b94112f4ac80658a488187a478220"
   },
   "proxies": [
     {
-      "address": "0x91E498A0a9B47EEA5F8ba6c2553789BacbBED561",
-      "txHash": "0x4d9b5703e853ce9357a58ef0ab2322b3b0071157b9acdc5a22eceeb55e9f659c",
+      "address": "0x6737fAA302d607e0e3B06C51E3b5D28c5624F96A",
+      "txHash": "0x4b3182bbac3335075bf365ab5f88072265f800a85595c457dec25f9e835434f0",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "1d01ef882d5cf9233950c3e364270024e96254969c6489ee4d365f3ebf8fce71": {
-      "address": "0xed4F637d2657Bd54deEC5B89D6885827Cc55f192",
-      "txHash": "0x480c0bb654d2bc076dffcadcd25b0417f8525d4748908718040b8e41145dff4b",
+    "3ba6c147fc735f1e0d68fdafdf406c5b1c5b293571382524a296272699c51336": {
+      "address": "0xD3418C4FA4a7953394533E494Beed9082f809CC1",
+      "txHash": "0xbb88e6961b341da5f7fc60e57f82d0412187beca05b3002dd845a13536b1fc4b",
       "layout": {
         "storage": [
           {
@@ -183,21 +183,21 @@
             "slot": "301",
             "type": "t_struct(Counter)2077_storage",
             "contract": "ParallelID",
-            "src": "contracts/ParallelID.sol:24"
+            "src": "contracts/ParallelID.sol:25"
           },
           {
             "label": "_traitsIndex",
             "offset": 0,
             "slot": "302",
-            "type": "t_struct(OrderedStringSet)4082_storage",
+            "type": "t_struct(OrderedStringSet)4134_storage",
             "contract": "ParallelID",
-            "src": "contracts/ParallelID.sol:27"
+            "src": "contracts/ParallelID.sol:28"
           },
           {
             "label": "_metas",
             "offset": 0,
             "slot": "304",
-            "type": "t_mapping(t_uint256,t_struct(Metadata)3124_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Metadata)3113_storage)",
             "contract": "ParallelID",
             "src": "contracts/ParallelID.sol:43"
           },
@@ -283,7 +283,7 @@
             "label": "mapping(uint256 => string)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Metadata)3124_storage)": {
+          "t_mapping(t_uint256,t_struct(Metadata)3113_storage)": {
             "label": "mapping(uint256 => struct ParallelID.Metadata)",
             "numberOfBytes": "32"
           },
@@ -319,7 +319,7 @@
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(Metadata)3124_storage": {
+          "t_struct(Metadata)3113_storage": {
             "label": "struct ParallelID.Metadata",
             "members": [
               {
@@ -335,15 +335,9 @@
                 "slot": "1"
               },
               {
-                "label": "_citizenship",
-                "type": "t_uint16",
-                "offset": 2,
-                "slot": "1"
-              },
-              {
                 "label": "_anySanctions",
                 "type": "t_bool",
-                "offset": 4,
+                "offset": 2,
                 "slot": "1"
               },
               {
@@ -361,7 +355,7 @@
             ],
             "numberOfBytes": "128"
           },
-          "t_struct(OrderedStringSet)4082_storage": {
+          "t_struct(OrderedStringSet)4134_storage": {
             "label": "struct OrderedStringSets.OrderedStringSet",
             "members": [
               {
