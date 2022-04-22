@@ -22,7 +22,7 @@ async function main() {
   const uri = 'ipfs://QmPdP2Uw3nEUojBujVf9XqCrxxRhsXrxxMJ7ZipURunXUp'
   const addy = '0xf0495779260E786409c2ee6B85cE6Ef7B07377F8'
 
-  await contract.mint(addy, uri, ['kyc'], SUBJECT_INDIVIDUAL, 840)
+  await contract.mint(addy, uri, ['kyc'], SUBJECT_INDIVIDUAL)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
