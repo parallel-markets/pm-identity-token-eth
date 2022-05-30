@@ -2,7 +2,7 @@ name: ci
 on: push
 
 env:
-  NODE_VERSION: 14.17.1
+  NODE_VERSION: 14.19.2
 
 jobs:
   test:
