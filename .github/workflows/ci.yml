@@ -27,7 +27,7 @@ jobs:
           path: ~/.pnpm-store
           key: test-pnpm-store-cache-v0-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
-      - run: pnpm install --no-optional
+      - run: pnpm install --no-optional --store-dir ~/.pnpm-store
         if: steps.node_modules-cache.outputs.cache-hit != 'true' || steps.pnpm-store-cache.outputs.cache-hit != 'true'
 
       - run: pnpm test
