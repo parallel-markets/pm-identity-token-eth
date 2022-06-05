@@ -23,8 +23,9 @@ Here's a quick example example of usage on-chain to determine if a Token holder 
 import "@parallelmarkets/token/contracts/IParallelID.sol";
 
 contract MyContract {
-    // Address on the Rinkeby test network
-    address PID_CONTRACT = "0x6737fAA302d607e0e3B06C51E3b5D28c5624F96A";
+    // This is the address on Mainnet. For testing, use the Rinkeby contract
+    // at 0x6737fAA302d607e0e3B06C51E3b5D28c5624F96A
+    address PID_CONTRACT = "0x9ec6232742b6068ce733645AF16BA277Fa412B0A";
 
     function isSanctionsSafe(address subject) returns (bool) {
         // Get a handle for the Parallel Identity Token contract
