@@ -72,8 +72,9 @@ const abi = [
   "function isSanctionsSafe(uint256 tokenId) view returns (bool)"
 ]
 
-// Address on the Rinkeby test network
-const PID_CONTRACT = "0x6737fAA302d607e0e3B06C51E3b5D28c5624F96A"
+// This is the address on Mainnet. For testing in the sandbox environment, use the
+// Rinkeby contract at 0x0F2255E8aD232c5740879e3B495EA858D93C3016
+const PID_CONTRACT = "0x9ec6232742b6068ce733645AF16BA277Fa412B0A"
 const contract = new Contract(PID_CONTRACT, abi, provider)
 
 const isSanctionsSafe = (address) => {
