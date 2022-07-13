@@ -19,7 +19,7 @@ You can access PID Token information either directly on-chain on the Ethereum Ma
 
 Here's a quick example example of usage on-chain to determine if a Token holder (individual or business) is currently accredited and free from sanctions.
 
-```sol
+```solidity
 import "@parallelmarkets/token/contracts/IParallelID.sol";
 
 contract MyContract {
