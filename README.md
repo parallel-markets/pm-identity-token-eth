@@ -23,11 +23,11 @@ Here's a quick example example of usage on-chain to determine if a Token holder 
 import "@parallelmarkets/token/contracts/IParallelID.sol";
 
 contract MyContract {
-    // This is the address on Mainnet. For testing in the sandbox environment, use the
-    // Rinkeby contract at 0x0F2255E8aD232c5740879e3B495EA858D93C3016
-    address PID_CONTRACT = "0x9ec6232742b6068ce733645AF16BA277Fa412B0A";
+    // 0x9ec6... is the address on Mainnet. For testing in the sandbox environment,
+    // use the Goerli contract at 0x0F2255E8aD232c5740879e3B495EA858D93C3016
+    address public PID_CONTRACT = 0x9ec6232742b6068ce733645AF16BA277Fa412B0A;
 
-    function isSanctionsSafe(address subject) returns (bool) {
+    function isSanctionsSafe(address subject) public view returns (bool) {
         // Get a handle for the Parallel Identity Token contract
         IParallelID pid = IParallelID(PID_CONTRACT);
 
@@ -40,7 +40,7 @@ contract MyContract {
         return false;
     }
 
-    function currentlyAccredited(address subject) returns (bool) {
+    function currentlyAccredited(address subject) public view returns (bool) {
         // Get a handle for the Parallel Identity Token contract
         IParallelID pid = IParallelID(PID_CONTRACT);
 
@@ -72,8 +72,8 @@ const abi = [
   "function isSanctionsSafe(uint256 tokenId) view returns (bool)"
 ]
 
-// This is the address on Mainnet. For testing in the sandbox environment, use the
-// Rinkeby contract at 0x0F2255E8aD232c5740879e3B495EA858D93C3016
+// 0x9ec6... is the address on Mainnet. For testing in the sandbox environment,
+// use the Goerli contract at 0x0F2255E8aD232c5740879e3B495EA858D93C3016
 const PID_CONTRACT = "0x9ec6232742b6068ce733645AF16BA277Fa412B0A"
 const contract = new Contract(PID_CONTRACT, abi, provider)
 
