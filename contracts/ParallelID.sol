@@ -54,20 +54,11 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         __Ownable_init();
     }
 
-    function safeTransferFrom(
-        address,
-        address,
-        uint256,
-        bytes memory
-    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
+    function safeTransferFrom(address, address, uint256, bytes memory) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         noop();
     }
 
-    function transferFrom(
-        address,
-        address,
-        uint256
-    ) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
+    function transferFrom(address, address, uint256) public virtual override(IERC721Upgradeable, ERC721Upgradeable) {
         noop();
     }
 
@@ -87,12 +78,7 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         mintCost = newCost;
     }
 
-    function mint(
-        address recipient,
-        string memory tokenDataURI,
-        string[] memory _traits,
-        uint16 _subjectType
-    ) external virtual onlyOwner returns (uint256) {
+    function mint(address recipient, string memory tokenDataURI, string[] memory _traits, uint16 _subjectType) external virtual onlyOwner returns (uint256) {
         return _mint(recipient, tokenDataURI, _traits, _subjectType);
     }
 
@@ -127,12 +113,7 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         return _mint(account, tokenDataURI, _traits, _subjectType);
     }
 
-    function _mint(
-        address recipient,
-        string memory tokenDataURI,
-        string[] memory _traits,
-        uint16 _subjectType
-    ) internal virtual returns (uint256) {
+    function _mint(address recipient, string memory tokenDataURI, string[] memory _traits, uint16 _subjectType) internal virtual returns (uint256) {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
@@ -254,11 +235,7 @@ contract ParallelID is ERC721Upgradeable, ERC721URIStorageUpgradeable, ERC721Enu
         return super.supportsInterface(interfaceId);
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 

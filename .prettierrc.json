@@ -16,7 +16,6 @@
       "files": ["*.sol"],
       "options": {
         "printWidth": 180,
-        "explicitTypes": "always",
         "singleQuote": false,
         "semi": true   
       }
