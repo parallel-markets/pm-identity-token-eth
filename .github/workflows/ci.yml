@@ -19,13 +19,13 @@ jobs:
         id: node_modules-cache # id to use in retrieve action
         with:
           path: node_modules
-          key: test-node-modules-cache-v0-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: test-node-modules-cache-v1-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - uses: actions/cache@v3
         id: pnpm-store-cache # id to use in retrieve action
         with:
           path: ~/.pnpm-store
-          key: test-pnpm-store-cache-v0-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: test-pnpm-store-cache-v1-${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: pnpm install --no-optional --store-dir ~/.pnpm-store
         if: steps.node_modules-cache.outputs.cache-hit != 'true' || steps.pnpm-store-cache.outputs.cache-hit != 'true'
