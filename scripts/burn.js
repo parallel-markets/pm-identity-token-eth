@@ -13,10 +13,20 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
+  if (!process.env.PRIVATE_KEY) {
+    console.error("Please set PRIVATE_KEY to burn a PID token.")
+    return
+  }
+
+  if (!process.env.BURN_TOKEN_ID) {
+    console.error("Please set BURN_TOKEN_ID to burn.")
+    return
+  }
+
   // We get the contract to deploy
   const factory = await ethers.getContractFactory('ParallelID')
   const contract = await factory.attach('0x9ec6232742b6068ce733645AF16BA277Fa412B0A')
-  const tokenId = 185
+  const tokenId = process.env.BURN_TOKEN_ID
   await contract.burn(tokenId)
 }
 
