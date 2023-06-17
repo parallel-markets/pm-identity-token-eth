@@ -14,12 +14,12 @@ async function main() {
   // await hre.run('compile');
 
   if (!process.env.PRIVATE_KEY) {
-    console.error("Please set PRIVATE_KEY to burn a PID token.")
+    console.error('Please set PRIVATE_KEY to burn a PID token.')
     return
   }
 
   if (!process.env.BURN_TOKEN_ID) {
-    console.error("Please set BURN_TOKEN_ID to burn.")
+    console.error('Please set BURN_TOKEN_ID to burn.')
     return
   }
 
